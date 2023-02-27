@@ -135,15 +135,34 @@ class COCOeval:
             gt['ignore'] = 'iscrowd' in gt and gt['iscrowd']
             if 'keypoints' in p.iouType:
                 if p.iouType == 'keypoints_wholebody':
+                    self.score_key = 'wholebody_score'
+                    partial = False
                     body_gt = gt['keypoints']
-                    foot_gt = gt['foot_kpts']
-                    face_gt = gt['face_kpts']
-                    lefthand_gt = gt['lefthand_kpts']
-                    righthand_gt = gt['righthand_kpts']
-                    wholebody_gt = body_gt + foot_gt + face_gt + lefthand_gt + righthand_gt
+                    wholebody_gt = body_gt
+                    if "foot_kpts" in gt:
+                        foot_gt = gt['foot_kpts']
+                        wholebody_gt = wholebody_gt + foot_gt
+                    else:
+                        partial = True
+                    if "face_kpts" in gt :
+                        face_gt = gt['face_kpts']
+                        wholebody_gt = wholebody_gt + face_gt
+                    else:
+                        partial = True
+                    if "lefthand_kpts" in gt :
+                        lefthand_gt = gt['lefthand_kpts']
+                        wholebody_gt = wholebody_gt + lefthand_gt
+                    else:
+                        partial = True
+                    if "righthand_kpts" in gt :
+                        righthand_gt = gt['righthand_kpts']
+                        wholebody_gt = wholebody_gt + righthand_gt              
+                    else:
+                        partial = True
                     g = np.array(wholebody_gt)
                     k = np.count_nonzero(g[2::3] > 0)
-                    self.score_key = 'wholebody_score'
+                    if partial:
+                        self.score_key = self.score_key + "_partial"
                 elif p.iouType == 'keypoints_foot':
                     g = np.array(gt['foot_kpts'])
                     k = np.count_nonzero(g[2::3] > 0)
@@ -182,11 +201,22 @@ class COCOeval:
             if 'keypoints' in p.iouType:
                 if p.iouType == 'keypoints_wholebody':
                     body_dt = dt['keypoints']
-                    foot_dt = dt['foot_kpts']
-                    face_dt = dt['face_kpts']
-                    lefthand_dt = dt['lefthand_kpts']
-                    righthand_dt = dt['righthand_kpts']
-                    wholebody_dt = body_dt + foot_dt + face_dt + lefthand_dt + righthand_dt
+                    wholebody_dt = body_dt
+                    if "foot_kpts" in dt:
+                        foot_dt = dt['foot_kpts']
+                        wholebody_dt = wholebody_dt + foot_dt
+                    if "face_kpts" in dt:
+                        face_dt = dt['face_kpts']
+                        wholebody_dt = wholebody_dt + face_dt
+                    if "lefthand_kpts" in dt:
+                        lefthand_dt = dt['lefthand_kpts']
+                        wholebody_dt = wholebody_dt + lefthand_dt
+                    if "righthand_kpts" in dt:
+                        righthand_dt = dt['righthand_kpts']
+                        wholebody_dt = wholebody_dt + righthand_dt
+                    if "foot_kpts" in dt:
+                        foot_dt = dt['foot_kpts']
+                        wholebody_dt = wholebody_dt + foot_dt
                     d = np.array(wholebody_dt)
                     k = np.count_nonzero(d[2::3] > 0)
                     if self.score_key not in dt:
@@ -325,11 +355,19 @@ class COCOeval:
             # create bounds for ignore regions(double the gt bbox)
             if p.iouType == 'keypoints_wholebody':
                 body_gt = gt['keypoints']
-                foot_gt = gt['foot_kpts']
-                face_gt = gt['face_kpts']
-                lefthand_gt = gt['lefthand_kpts']
-                righthand_gt = gt['righthand_kpts']
-                wholebody_gt = body_gt + foot_gt + face_gt + lefthand_gt + righthand_gt
+                wholebody_gt = body_gt
+                if 'foot_kpts' in gt:
+                    foot_gt = gt['foot_kpts']
+                    wholebody_gt = wholebody_gt + foot_gt
+                if 'face_kpts' in gt:
+                    face_gt = gt['face_kpts']
+                    wholebody_gt = wholebody_gt + face_gt
+                if 'lefthand_kpts' in gt:
+                    lefthand_gt = gt['lefthand_kpts']
+                    wholebody_gt = wholebody_gt + lefthand_gt
+                if 'righthand_kpts' in gt:
+                    righthand_gt = gt['righthand_kpts']
+                    wholebody_gt = wholebody_gt + righthand_gt
                 g = np.array(wholebody_gt)
             elif p.iouType == 'keypoints_foot':
                 g = np.array(gt['foot_kpts'])
@@ -350,11 +388,19 @@ class COCOeval:
             for i, dt in enumerate(dts):
                 if p.iouType == 'keypoints_wholebody':
                     body_dt = dt['keypoints']
-                    foot_dt = dt['foot_kpts']
-                    face_dt = dt['face_kpts']
-                    lefthand_dt = dt['lefthand_kpts']
-                    righthand_dt = dt['righthand_kpts']
-                    wholebody_dt = body_dt + foot_dt + face_dt + lefthand_dt + righthand_dt
+                    wholebody_dt = body_dt
+                    if 'foot_kpts' in dt:
+                        foot_dt = dt['foot_kpts']
+                        wholebody_dt = wholebody_dt + foot_dt
+                    if 'face_kpts' in dt:
+                        face_dt = dt['face_kpts']
+                        wholebody_dt = wholebody_dt + face_dt
+                    if 'lefthand_kpts' in dt:
+                        lefthand_dt = dt['lefthand_kpts']
+                        wholebody_dt = wholebody_dt + lefthand_dt
+                    if 'righthand_kpts' in dt:
+                        righthand_dt = dt['righthand_kpts']
+                        wholebody_dt = wholebody_dt + righthand_dt
                     d = np.array(wholebody_dt)
                 elif p.iouType == 'keypoints_foot':
                     d = np.array(dt['foot_kpts'])
